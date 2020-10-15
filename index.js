@@ -47,26 +47,56 @@ document.addEventListener('DOMContentLoaded', () => {
     
         for (const topic of topic_instances)
         document.getElementById(`comments ${topic.id}`).addEventListener("click", () => {
-            console.log(`${topic.id} clicked`);
-            getComments(topic.id)
+            
+            if (topic.comments_rendered === false) {
+                getComments(topic)
+                
+            } else if (topic.comments_show === true) {
+                topic.comments_show = false
+                //debugger
+                document.getElementsByClassName(`comments ${topic.id}`)[0].style = "display: none"
+                document.getElementById(`comments ${topic.id}`).innerHTML = "Show Comments"
+            } else if (topic.comments_show === false) {
+                topic.comments_show = true
+                document.getElementsByClassName(`comments ${topic.id}`)[0].style = "display: block"
+                document.getElementById(`comments ${topic.id}`).innerHTML = "Hide Comments"
+            }
+            
         })
         
     }
 
-    function getComments(topic_id){
-        fetch(`${baseUrl}/users/1/topics/${topic_id}/comments`)
+    function getComments(topic){
+
+        renderAddComment(topic)
+
+        fetch(`${baseUrl}/users/1/topics/${topic.id}/comments`)
         .then(resp => resp.json())
         .then(function(comments) {
             let comment_array = comments['data']
-            
             
             for (const comment of comment_array) {
                 let new_comment = new Comment(comment['attributes']['id'], comment['attributes']['content'], comment['attributes']['name'], comment['attributes']['email'], comment['attributes']['localTime'], comment['attributes']['topic_id'])
 
                 new_comment.renderComment()
+                topic.comments_rendered = true
+                topic.comments_show = true
+                document.getElementById(`comments ${topic.id}`).innerHTML = "Hide Comments"
             }
 
+
         })
+    }
+
+    function renderAddComment(topic) {
+        
+        document.getElementsByClassName(`comments ${topic.id}`)[0].innerHTML = 
+
+            `<br><form>
+                <textarea class=\"textarea\"></textarea>
+                <br><input type=\"submit\" class=\"button is-secondary\" id=\"add comments ${topic.id}" value=\"Add Comment\"></input>
+                
+            </form><br>`
     }
 
 })
@@ -75,47 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-class Topic {
-    
-    constructor(id, title, content, localtime, name, passage_ids, comment_ids) {
-        this.title = title
-        this.content = content
-        this.id = id
-        this.localtime = localtime
-        this.name = name
-        this.passage_ids = passage_ids
-        this.comment_ids = comment_ids
 
-    }
-
-    renderTopic() {
-        document.getElementById("feed").innerHTML += 
-            `<div class=\"card article\">
-                <div class=\"card-content\">
-                    <div class=\"media\">
-                        <div class=\"media-content has-text-left\" id=\"topic ${this.id}\">
-                            <h2 class=\"title\">${this.title}</h2>
-                            <p>By: ${this.name}</p>
-                            <p>Updated: ${this.localtime}</p>
-                            <h2 class=\"subtitle\">${this.content}</h2>
-                            
-                            <button class=\"button is-primary\" id=\"comments ${this.id}">Comments</button> <a class=\"button is-primary\" id=\"passages ${this.id}">Passages</a>
-                            <span class=\"icon is-small\"><i class=\"far fa-heart\" id=\"heart ${this.id}\" style=\"color: red\"></i></span>
-                            <br>
-                            <div class=\"comments ${this.id}\"></div>
-                            <br>
-                            <div class=\"passages ${this.id}\"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>`
-
-
-    }
-
-
-
-}
 
 class Passage {
     constructor(content, book, chapter, verse, topic_ids) {
@@ -132,28 +122,4 @@ class Passage {
 
 }
 
-class Comment {
-    constructor(id, content, name, email, localtime, topic_id) {
-        this.id = id
-        this.content = content
-        this.name = name
-        this.email = email
-        this.localtime = localtime
-        this.topic_id = topic_id
-    }
 
-    renderComment() {
-        
-        document.getElementsByClassName(`comments ${this.topic_id}`)[0].innerHTML += 
-            `<div class="media-content">
-                <div class="content">
-                    <p><strong>${this.name}</strong>
-                        <small>${this.email}</small>
-                        <small>${this.localtime}</small>
-                    <br>${this.content}
-                    </p>
-                </div>
-            </div>
-            `
-    }
-}
