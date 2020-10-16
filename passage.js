@@ -20,10 +20,25 @@ class Passage {
         </div>`
     }
 
-    static addPassageListener(topic_instances) {
+    static addShowPassageListener(topic_instances) {
+
         for (const topic of topic_instances) {
             document.getElementById(`passages ${topic.id}`).addEventListener("click", () => {
-                Passage.getPassages(topic)
+                
+
+                if (topic.passages_rendered === false) {
+                    Passage.getPassages(topic)
+                    
+                } else if (topic.passages_show === true) {
+                    topic.passages_show = false
+                    //debugger
+                    document.getElementsByClassName(`passages ${topic.id}`)[0].style = "display: none"
+                    document.getElementById(`passages ${topic.id}`).innerHTML = "Show passages"
+                } else if (topic.passages_show === false) {
+                    topic.passages_show = true
+                    document.getElementsByClassName(`passages ${topic.id}`)[0].style = "display: block"
+                    document.getElementById(`passages ${topic.id}`).innerHTML = "Hide passages"
+                }
             })
         }
     }
@@ -34,11 +49,21 @@ class Passage {
         .then(function (passages) {
             let passage_array = passages['data']
             
-            for (const passage of passage_array) {
-                let new_passage = new Passage (passage['id'], passage['attributes']['content'], passage['attributes']['book'], passage['attributes']['chapter'], passage['attributes']['verse'], passage['attributes']['topic_ids'])
-
-                new_passage.renderPassage(topic)
+            if (passage_array.length === 0) {
+                topic.passages_rendered = true
+                topic.passages_show = true
+                document.getElementById(`passages ${topic.id}`).innerHTML = "Hide passages"
+            } else {
+                for (const passage of passage_array) {
+                    let new_passage = new Passage (passage['id'], passage['attributes']['content'], passage['attributes']['book'], passage['attributes']['chapter'], passage['attributes']['verse'], passage['attributes']['topic_ids'])
+    
+                    new_passage.renderPassage(topic)
+                    topic.passages_rendered = true
+                    topic.passages_show = true
+                    document.getElementById(`passages ${topic.id}`).innerHTML = "Hide passages"
+                }
             }
+
         })
     }
 }

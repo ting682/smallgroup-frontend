@@ -25,12 +25,12 @@ class Topic {
                             <p>By: ${this.name}</p>
                             <p>Updated: ${this.localtime}</p>
                             <h2 class=\"subtitle\">${this.content}</h2>
-                            <a class=\"button is-primary\" id=\"passages ${this.id}">Passages</a>
+                            <a class=\"button is-primary\" id=\"passages ${this.id}\">Show passages</a>
                             <div class=\"passages ${this.id}\">
                                 
                             </div>
-                            <br>
-                            <a class=\"button is-primary\" id=\"comments ${this.id}">Show Comments</a><br>
+                            <br><br>
+                            <a class=\"button is-primary\" id=\"comments ${this.id}\">Show Comments</a><br>
                             <div class=\"comments ${this.id}\">
                                 
                             </div>
@@ -72,9 +72,9 @@ class Topic {
                 
             }
             
-            Comment.addCommentListener(Topic.instances)
+            Comment.addShowCommentListener(Topic.instances)
 
-            Passage.addPassageListener(Topic.instances)
+            Passage.addShowPassageListener(Topic.instances)
         })
 
     }

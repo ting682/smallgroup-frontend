@@ -29,6 +29,7 @@ class Comment {
     static getComments(topic){
 
         Comment.renderAddComment(topic)
+        
 
         fetch(`${baseUrl}/users/1/topics/${topic.id}/comments`)
         .then(resp => resp.json())
@@ -52,7 +53,7 @@ class Comment {
                 }
             }
             
-
+            Comment.newCommentListener(topic)
 
         })
     }
@@ -61,20 +62,24 @@ class Comment {
         
         document.getElementsByClassName(`comments ${topic.id}`)[0].innerHTML = 
 
-            `<br><form>
+            `<br><form class=\"new comment${topic.id}\">
                 <textarea class=\"textarea\"></textarea>
-                <br><input type=\"submit\" class=\"button is-secondary\" id=\"add comments ${topic.id}" value=\"Add Comment\"></input>
+                <br><input type=\"submit\" class=\"button is-secondary\" id=\"add comments ${topic.id}" data-topic-id=\"${topic.id}\" value=\"Add comment\"></input>
                 
             </form><br>`
+
+        
     }
 
-    static addCommentListener(topic_instances) {
+    static addShowCommentListener(topic_instances) {
     
-        for (const topic of topic_instances)
+        for (const topic of topic_instances) {
+            
             document.getElementById(`comments ${topic.id}`).addEventListener("click", () => {
             
                 if (topic.comments_rendered === false) {
                     Comment.getComments(topic)
+                    
                     
                 } else if (topic.comments_show === true) {
                     topic.comments_show = false
@@ -87,7 +92,67 @@ class Comment {
                     document.getElementById(`comments ${topic.id}`).innerHTML = "Hide Comments"
                 }
             
-        })
+            })
+
+            
+        }
+
+
+    }
+
+    static newCommentListener(topic) {
         
+        document.querySelectorAll(`form.new.comment${topic.id}`)[0].onsubmit = function(event) {
+            
+            event.preventDefault()
+
+            //console.log(event)
+
+
+            //debugger
+            // let xmlhttp = new XMLHttpRequest()
+
+            // xmlhttp.open("POST", `${baseUrl}/users/1/topics/${topic.id}/comments`)
+            // xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+            // xmlhttp.send(JSON.stringify({
+            //     comment: {
+            //         topic_id: topic.id,
+            //         content: this.getElementsByTagName('textarea')[0].value,
+            //         user_id: "1"
+            //     }
+            // }))
+
+            
+            let configObj = {
+                method: "POST",
+                header: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    
+                    comment: {
+                        topic_id: topic.id,
+                        content: "hello",
+                        //content: this.getElementsByTagName('textarea')[0].value,
+                        user_id: "1"
+                    }
+                    
+                })
+            }
+
+            fetch(`${baseUrl}/users/1/topics/${topic.id}/comments`, configObj)
+            .then(resp => resp.json())
+            .then(function(data) {
+                
+                debugger
+
+            })
+        }
+
+        // document.getElementById(`add comments ${topic.id}`).addEventListener('click', () => {
+        //     console.log(`${topic.id} comment added`);
+            
+        //     debugger
+        // })
     }
 }
