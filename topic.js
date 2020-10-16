@@ -46,6 +46,37 @@ class Topic {
 
     }
 
+    static renderTopicPage() {
+        document.body.innerHTML = 
+            `<section class=\"articles\">
+                <div class=\"column is-8 is-offset-2\" id=\"feed\">
+                </div>
+            </section>`
+    }
 
+    static getTopics() {
+    
 
+        fetch(`${baseUrl}/users/1/topics`)
+        .then(resp => resp.json())
+        .then(function(topics) {
+            
+            let topic_array = topics['data']
+            Topic.renderTopicPage()
+            for (let i = 0; i < topic_array.length; i++) {
+                let new_topic = new Topic (topic_array[i]['id'], topic_array[i]['attributes']['title'], topic_array[i]['attributes']['content'], topic_array[i]['attributes']['localTime'], topic_array[i]['attributes']['name'], topic_array[i]['attributes']['passage_ids'], topic_array[i]['attributes']['comment_ids'])
+                
+                new_topic.renderTopic()
+                
+                Topic.instances.push(new_topic)
+                
+            }
+            
+            Comment.addCommentListener(Topic.instances)
+
+            Passage.addPassageListener(Topic.instances)
+        })
+
+    }
 }
+
