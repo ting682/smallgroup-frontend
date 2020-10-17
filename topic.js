@@ -48,14 +48,26 @@ class Topic {
 
     static renderTopicPage() {
         document.body.innerHTML = 
-            `<section class=\"articles\">
+            `
+            
+            <section class=\"articles\">
                 <div class=\"column is-8 is-offset-2\" id=\"feed\">
+                    <div class=\"card article\">
+                        <div class=\"card-content\">
+                            
+                            
+                            <button class=\"button is-primary\" id=\"add topic\">Add topic</button>
+                        </div>
+                    </div>
                 </div>
-            </section>`
+            </section>
+            
+            `
     }
 
     static getTopics() {
     
+        
 
         fetch(`${baseUrl}/users/1/topics`)
         .then(resp => resp.json())
@@ -63,6 +75,7 @@ class Topic {
             
             let topic_array = topics['data']
             Topic.renderTopicPage()
+            Topic.addTopic()
             for (let i = 0; i < topic_array.length; i++) {
                 let new_topic = new Topic (topic_array[i]['id'], topic_array[i]['attributes']['title'], topic_array[i]['attributes']['content'], topic_array[i]['attributes']['localTime'], topic_array[i]['attributes']['name'], topic_array[i]['attributes']['passage_ids'], topic_array[i]['attributes']['comment_ids'])
                 
@@ -77,6 +90,18 @@ class Topic {
             Passage.addShowPassageListener(Topic.instances)
         })
 
+    }
+
+    static addTopic(){
+        
+
+            var quill = new Quill('#editor', {
+                modules: {
+                  toolbar: '#toolbar'
+                },
+                placeholder: '',
+                theme: 'snow'  // or 'bubble'
+              });
     }
 }
 

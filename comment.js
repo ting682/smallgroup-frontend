@@ -105,37 +105,21 @@ class Comment {
         document.querySelectorAll(`form.new.comment${topic.id}`)[0].onsubmit = function(event) {
             
             event.preventDefault()
-
-            //console.log(event)
-
-
-            //debugger
-            // let xmlhttp = new XMLHttpRequest()
-
-            // xmlhttp.open("POST", `${baseUrl}/users/1/topics/${topic.id}/comments`)
-            // xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
-            // xmlhttp.send(JSON.stringify({
-            //     comment: {
-            //         topic_id: topic.id,
-            //         content: this.getElementsByTagName('textarea')[0].value,
-            //         user_id: "1"
-            //     }
-            // }))
-
             
             let configObj = {
                 method: "POST",
-                header: {
+                headers: {
                     'Content-Type': 'application/json'
                 },
+                
                 body: JSON.stringify({
                     
                     comment: {
                         topic_id: topic.id,
-                        content: "hello",
-                        //content: this.getElementsByTagName('textarea')[0].value,
+                        //content: "hello",
+                        content: this.getElementsByTagName('textarea')[0].value,
                         user_id: "1"
-                    }
+                    }   
                     
                 })
             }
@@ -149,10 +133,6 @@ class Comment {
             })
         }
 
-        // document.getElementById(`add comments ${topic.id}`).addEventListener('click', () => {
-        //     console.log(`${topic.id} comment added`);
-            
-        //     debugger
-        // })
+
     }
 }
