@@ -24,10 +24,10 @@ class Topic {
                     <div class=\"card-content\">
                         <div class=\"media\">
                             <div class=\"media-content has-text-left\" id=\"topic ${this.id}\">
-                                <h2 class=\"title\">${this.title}</h2>
+                                <h2 class=\"title\" id=\"topic ${this.id} title\">${this.title}</h2>
                                 <button class=\"button is-primary\" id=\"topicedit${this.id}\">Edit topic</button>
-                                <p>By: ${this.name}</p>
-                                <p>Updated: ${this.localtime}</p>
+                                <p id=\"topic ${this.id} name\">By: ${this.name}</p>
+                                <p id=\"topic ${this.id} localtime\">Updated: ${this.localtime}</p>
                                 <div class=\"subtitle\" id=\"topiccontent${this.id}\"></div>
                                 <a class=\"button is-primary\" id=\"passages ${this.id}\">Show passages</a>
                                 <div class=\"passages ${this.id}\">
@@ -330,7 +330,7 @@ class Topic {
                 }) 
                 //debugger
                 document.getElementsByClassName('ql-editor')[0].innerHTML = topic.content
-                Topic.patchFetchNewTopic(topic)
+                topic.patchFetchNewTopic()
             })
         }
 
@@ -339,10 +339,10 @@ class Topic {
     }
 
 
-    static patchFetchNewTopic(topic) {
+    patchFetchNewTopic() {
         
         document.getElementById('submittopic').addEventListener("click", (event) => {
-            console.log("submitted")
+            console.log("updated")
             
             
             //debugger
@@ -368,14 +368,33 @@ class Topic {
                 })
             }
 
-            fetch(`${baseUrl}/users/1/topics/${topic.id}`, configObj)
+            fetch(`${baseUrl}/users/1/topics/${this.id}`, configObj)
             .then(resp => resp.json())
-            .then(function(data) {
+            .then(function(topic_array) {
                 
-                
+                //debugger
+                Topic.updateRenderTopic(topic_array)
 
             })
         })
+    }
+
+    static updateRenderTopic(topic_array) {
+        
+        debugger
+
+        document.getElementsByClassName('modal is-active')[0].className = 'modal'
+
+        this.title = topic_array[i]['attributes']['title']
+        this.content = topic_array[i]['attributes']['content']
+        this.localtime = topic_array[i]['attributes']['localTime']
+        this.passage_ids = topic_array[i]['attributes']['passage_ids']
+        this.comment_ids = topic_array[i]['attributes']['comment_ids']
+
+        document.getElementById(`topic ${this.id} title`).innerHTML = this.title
+        document.getElementById(`topic ${this.id} localtime`).innerHTML = this.title
+        document.getElementById(`topiccontent${this.id}`).innerHTML = this.content
+
     }
 }
 
