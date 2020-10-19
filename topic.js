@@ -1,3 +1,5 @@
+//const {convertHtmlToDelta} = require('/node_modules/');
+
 class Topic {
     
     constructor(id, title, content, localtime, name, passage_ids, comment_ids) {
@@ -23,9 +25,10 @@ class Topic {
                         <div class=\"media\">
                             <div class=\"media-content has-text-left\" id=\"topic ${this.id}\">
                                 <h2 class=\"title\">${this.title}</h2>
+                                <button class=\"button is-primary\" id=\"topicedit${this.id}\">Edit topic</button>
                                 <p>By: ${this.name}</p>
                                 <p>Updated: ${this.localtime}</p>
-                                <h2 class=\"subtitle\">${this.content}</h2>
+                                <div class=\"subtitle\" id=\"topiccontent${this.id}\"></div>
                                 <a class=\"button is-primary\" id=\"passages ${this.id}\">Show passages</a>
                                 <div class=\"passages ${this.id}\">
                                     
@@ -45,8 +48,21 @@ class Topic {
                 
             </div>`
 
+        
 
+        //
+            // let quillTopic = new Quill(`#topiccontent${this.id}`)
+            // quillTopic.setContents(this.content)
+            
+            //document.getElementById(`topiccontent${this.id}`).innerHTML = quillTopic.root.innerHTML
+        //} else {
+        //    debugger
+        //    document.getElementById(`topiccontent${this.id}`).innerHTML = this.content
+        //}
+        document.getElementById(`topiccontent${this.id}`).innerHTML = this.content
     }
+
+
 
     static renderTopicPage() {
         document.body.innerHTML = 
@@ -103,6 +119,8 @@ class Topic {
 
             Passage.addShowPassageListener(Topic.instances)
             Topic.addTopic()
+
+            Topic.addEditListener(Topic.instances)
         })
 
     }
@@ -137,16 +155,16 @@ class Topic {
 
     static renderNewTopic() {
         document.getElementsByClassName('modal-card-body')[0].innerHTML = 
-            `<form>
+            `
                 <label><strong>Title</strong></label><br>
-                <input type=\"text\" name=\"title\"></input><br><br>
+                <input type=\"text\" name=\"title\" id=\"newtitle\"></input><br><br>
                 <div id=\"editor\" style=\"height: 375px\">
                 </div><br>
                 <button class=\"button is-primary\" id=\"addpassage\">Add passage</button><br><br>
                 <div id=\"topicpassages\"></div>
-                <input class=\"button is-primary\" type=\"submit\" value=\"Submit topic\" id=\"submittopic\"></input>
-            </form>`
-            
+                <button class=\"button is-primary\" id=\"submittopic\">Submit topic</button>
+            `
+        
             Topic.quill = new Quill('#editor', {
                 modules: {
                   toolbar: [
@@ -167,15 +185,196 @@ class Topic {
             // document.getElementsByClassName('ql-video').addEventListener('click', () => {
 
             // })
+            Topic.addPassageForm()
+            Topic.postFetchNewTopic()
     }
 
     static addPassageForm() {
-        document.getElementById('addpassage').addEventListener("click", () => {
 
-            
+        Topic.newPassageCount = 0
+
+        document.getElementById('addpassage').addEventListener("click", (event) => {
+
+            Topic.newPassageCount += 1
+
             document.getElementById('topicpassages').innerHTML +=
 
-                ``
+                `<div id=\"new passage ${Topic.newPassageCount}\">
+                    
+                    <label>New passage content</label><br>
+                    <textarea id=\"new passage content ${Topic.newPassageCount}\" style=\"width: 500px; height: 100px\"></textarea><br>
+                    <label>Book:</label><br>
+                    <input type=\"text\" id=\"new passage book ${Topic.newPassageCount}\"></input><br>
+                    <label>Chapter:</label><br>
+                    <input type=\"text\" id=\"new passage chapter ${Topic.newPassageCount}\"></input><br>
+                    <label>Verse:</label><br>
+                    <input type=\"text\" id=\"new passage verse ${Topic.newPassageCount}\"></input><br><br>
+                </div>
+                `
+                
+            //add event listener and button to remove new passage div
+           
+            event.preventDefault()
+        })
+        
+    }
+
+    static postFetchNewTopic() {
+        
+        document.getElementById('submittopic').addEventListener("click", (event) => {
+            console.log("submitted")
+            
+            
+            //debugger
+
+            let newPassagesForTopic = Topic.getNewPassagesForm()
+
+            let configObj = {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                
+                body: JSON.stringify({
+                    
+                    topic: {
+                        title: document.getElementById('newtitle').value,
+                        //content: "hello",
+                        content: Topic.quill.root.innerHTML,
+                        passages_attributes: newPassagesForTopic,
+                        user_id: "1"
+                    }   
+                    
+                })
+            }
+
+            fetch(`${baseUrl}/users/1/topics`, configObj)
+            .then(resp => resp.json())
+            .then(function(data) {
+                
+                
+
+            })
+        })
+    }
+
+    static getNewPassagesForm() {
+
+        let newPassages = []
+        //debugger
+        //let newPassage = []
+        for(let i = 1; i < Topic.newPassageCount + 1; i++) {
+            //let passage_num = String(i - 1)
+            newPassages.push({
+                
+                content: document.getElementById(`new passage content ${i}`).value,
+                book: document.getElementById(`new passage book ${i}`).value,
+                chapter: document.getElementById(`new passage chapter ${i}`).value,
+                verse: document.getElementById(`new passage verse ${i}`).value,
+                user_id: "1"
+            
+        })
+
+            
+            
+        }
+
+        return newPassages
+    }
+
+    static addEditListener(topic_instances) {
+        
+        for (const topic of topic_instances) {
+            document.getElementById(`topicedit${topic.id}`).addEventListener("click", (event) => {
+
+                document.getElementsByClassName('modal-card-body')[0].innerHTML = 
+                `
+                    <label><strong>Title</strong></label><br>
+                    <input type=\"text\" name=\"title\" id=\"newtitle\" value=\"${topic.title}\"></input><br><br>
+                    <div id=\"editor\" style=\"height: 375px\">
+                    </div><br>
+                    <button class=\"button is-primary\" id=\"addpassage\">Add passage</button><br><br>
+                    <div id=\"topicpassages\"></div>
+                    <button class=\"button is-primary\" id=\"submittopic\">Submit topic</button>
+                `
+            
+                Topic.quill = new Quill('#editor', {
+                    modules: {
+                      toolbar: [
+                        [{ 'font': [] }, { 'size': [] }],
+                        [ 'bold', 'italic', 'underline', 'strike' ],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'script': 'super' }, { 'script': 'sub' }],
+                        [{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block' ],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }],
+                        [ 'direction', { 'align': [] }],
+                        [ 'link', 'image', 'video', 'formula' ],
+                        [ 'clean' ]]
+                    },
+                    placeholder: '',
+                    theme: 'snow'  // or 'bubble'
+                  });
+
+                              
+                document.getElementsByClassName('modal')[0].className = 'modal is-active'
+                
+                document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
+                    
+                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                    Topic.addTopic()
+                })
+
+                //debugger
+                document.getElementsByClassName('ql-video')[0].addEventListener("click", () => {
+                    document.getElementsByClassName('ql-tooltip')[0].style = "top: 30px; left: 0px"
+                }) 
+                //debugger
+                document.getElementsByClassName('ql-editor')[0].innerHTML = topic.content
+                Topic.patchFetchNewTopic(topic)
+            })
+        }
+
+        
+        
+    }
+
+
+    static patchFetchNewTopic(topic) {
+        
+        document.getElementById('submittopic').addEventListener("click", (event) => {
+            console.log("submitted")
+            
+            
+            //debugger
+
+            let newPassagesForTopic = Topic.getNewPassagesForm()
+
+            let configObj = {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                
+                body: JSON.stringify({
+                    
+                    topic: {
+                        title: document.getElementById('newtitle').value,
+                        //content: "hello",
+                        content: Topic.quill.root.innerHTML,
+                        passages_attributes: newPassagesForTopic,
+                        user_id: "1"
+                    }   
+                    
+                })
+            }
+
+            fetch(`${baseUrl}/users/1/topics/${topic.id}`, configObj)
+            .then(resp => resp.json())
+            .then(function(data) {
+                
+                
+
+            })
         })
     }
 }
