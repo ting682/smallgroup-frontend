@@ -72,30 +72,32 @@ class Comment {
     }
 
     static addShowCommentListener(topic_instances) {
+        
+            for (const topic of topic_instances) {
+            
+                document.getElementById(`comments ${topic.id}`).addEventListener("click", () => {
+                
+                    if (topic.comments_rendered === false) {
+                        Comment.getComments(topic)
+                        
+                        
+                    } else if (topic.comments_show === true) {
+                        topic.comments_show = false
+                        //debugger
+                        document.getElementsByClassName(`comments ${topic.id}`)[0].style = "display: none"
+                        document.getElementById(`comments ${topic.id}`).innerHTML = "Show Comments"
+                    } else if (topic.comments_show === false) {
+                        topic.comments_show = true
+                        document.getElementsByClassName(`comments ${topic.id}`)[0].style = "display: block"
+                        document.getElementById(`comments ${topic.id}`).innerHTML = "Hide Comments"
+                    }
+                
+                })
     
-        for (const topic of topic_instances) {
-            
-            document.getElementById(`comments ${topic.id}`).addEventListener("click", () => {
-            
-                if (topic.comments_rendered === false) {
-                    Comment.getComments(topic)
-                    
-                    
-                } else if (topic.comments_show === true) {
-                    topic.comments_show = false
-                    //debugger
-                    document.getElementsByClassName(`comments ${topic.id}`)[0].style = "display: none"
-                    document.getElementById(`comments ${topic.id}`).innerHTML = "Show Comments"
-                } else if (topic.comments_show === false) {
-                    topic.comments_show = true
-                    document.getElementsByClassName(`comments ${topic.id}`)[0].style = "display: block"
-                    document.getElementById(`comments ${topic.id}`).innerHTML = "Hide Comments"
-                }
-            
-            })
-
-            
-        }
+                
+            }
+         
+        
 
 
     }
@@ -126,9 +128,20 @@ class Comment {
 
             fetch(`${baseUrl}/users/1/topics/${topic.id}/comments`, configObj)
             .then(resp => resp.json())
-            .then(function(data) {
+            .then(function(comment_data) {
                 
-                debugger
+                //debugger
+
+                let new_comment = new Comment(
+                    comment_data['data']['attributes']['id'], 
+                    comment_data['data']['attributes']['content'], 
+                    comment_data['data']['attributes']['name'], 
+                    comment_data['data']['attributes']['email'], 
+                    comment_data['data']['attributes']['localTime'], 
+                    comment_data['data']['attributes']['topic_id'])
+
+                
+                new_comment.renderComment()
 
             })
         }

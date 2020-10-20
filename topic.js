@@ -46,19 +46,10 @@ class Topic {
                         </div>
                     </div>
                 
-            </div>`
+                </div>`
 
         
 
-        //
-            // let quillTopic = new Quill(`#topiccontent${this.id}`)
-            // quillTopic.setContents(this.content)
-            
-            //document.getElementById(`topiccontent${this.id}`).innerHTML = quillTopic.root.innerHTML
-        //} else {
-        //    debugger
-        //    document.getElementById(`topiccontent${this.id}`).innerHTML = this.content
-        //}
         document.getElementById(`topiccontent${this.id}`).innerHTML = this.content
     }
 
@@ -67,7 +58,6 @@ class Topic {
     static renderTopicPage() {
         document.body.innerHTML = 
             `
-
             <section class=\"articles\">
                 <div class=\"column is-8 is-offset-2\" id=\"feed\">
                     <div class=\"card article\">
@@ -113,6 +103,7 @@ class Topic {
                 
                 Topic.instances.push(new_topic)
                 
+                
             }
             
             Comment.addShowCommentListener(Topic.instances)
@@ -131,7 +122,7 @@ class Topic {
 
         document.getElementById('addtopic').addEventListener("click", () => {
             //debugger
-            Topic.renderNewTopic()
+            Topic.renderNewTopicForm()
             
             
             document.getElementsByClassName('modal')[0].className = 'modal is-active'
@@ -153,7 +144,7 @@ class Topic {
  
     }
 
-    static renderNewTopic() {
+    static renderNewTopicForm() {
         document.getElementsByClassName('modal-card-body')[0].innerHTML = 
             `
                 <label><strong>Title</strong></label><br>
@@ -185,39 +176,11 @@ class Topic {
             // document.getElementsByClassName('ql-video').addEventListener('click', () => {
 
             // })
-            Topic.addPassageForm()
+            Passage.addPassageForm()
             Topic.postFetchNewTopic()
     }
 
-    static addPassageForm() {
 
-        Topic.newPassageCount = 0
-
-        document.getElementById('addpassage').addEventListener("click", (event) => {
-
-            Topic.newPassageCount += 1
-
-            document.getElementById('topicpassages').innerHTML +=
-
-                `<div id=\"new passage ${Topic.newPassageCount}\">
-                    
-                    <label>New passage content</label><br>
-                    <textarea id=\"new passage content ${Topic.newPassageCount}\" style=\"width: 500px; height: 100px\"></textarea><br>
-                    <label>Book:</label><br>
-                    <input type=\"text\" id=\"new passage book ${Topic.newPassageCount}\"></input><br>
-                    <label>Chapter:</label><br>
-                    <input type=\"text\" id=\"new passage chapter ${Topic.newPassageCount}\"></input><br>
-                    <label>Verse:</label><br>
-                    <input type=\"text\" id=\"new passage verse ${Topic.newPassageCount}\"></input><br><br>
-                </div>
-                `
-                
-            //add event listener and button to remove new passage div
-           
-            event.preventDefault()
-        })
-        
-    }
 
     static postFetchNewTopic() {
         
@@ -250,13 +213,32 @@ class Topic {
 
             fetch(`${baseUrl}/users/1/topics`, configObj)
             .then(resp => resp.json())
-            .then(function(data) {
-                
+            .then(function(topic_data) {
                 
 
+                document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                //debugger
+                let new_topic = new Topic (
+                    topic_data['data']['id'], 
+                    topic_data['data']['attributes']['title'], 
+                    topic_data['data']['attributes']['content'], 
+                    topic_data['data']['attributes']['localTime'], 
+                    topic_data['data']['attributes']['name'], 
+                    topic_data['data']['attributes']['passage_ids'], 
+                    topic_data['data']['attributes']['comment_ids'])
+                
+                Topic.instances.push(new_topic)
+                new_topic.renderTopic()
+                Comment.addShowCommentListener([new_topic])
+
+                Passage.addShowPassageListener([new_topic])
+                
+
+                Topic.addEditListener([new_topic])
             })
         })
     }
+
 
     static getNewPassagesForm() {
 
@@ -284,57 +266,60 @@ class Topic {
 
     static addEditListener(topic_instances) {
         
-        for (const topic of topic_instances) {
-            document.getElementById(`topicedit${topic.id}`).addEventListener("click", (event) => {
-
-                document.getElementsByClassName('modal-card-body')[0].innerHTML = 
-                `
-                    <label><strong>Title</strong></label><br>
-                    <input type=\"text\" name=\"title\" id=\"newtitle\" value=\"${topic.title}\"></input><br><br>
-                    <div id=\"editor\" style=\"height: 375px\">
-                    </div><br>
-                    <button class=\"button is-primary\" id=\"addpassage\">Add passage</button><br><br>
-                    <div id=\"topicpassages\"></div>
-                    <button class=\"button is-primary\" id=\"submittopic\">Submit topic</button>
-                `
-            
-                Topic.quill = new Quill('#editor', {
-                    modules: {
-                      toolbar: [
-                        [{ 'font': [] }, { 'size': [] }],
-                        [ 'bold', 'italic', 'underline', 'strike' ],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'script': 'super' }, { 'script': 'sub' }],
-                        [{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block' ],
-                        [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }],
-                        [ 'direction', { 'align': [] }],
-                        [ 'link', 'image', 'video', 'formula' ],
-                        [ 'clean' ]]
-                    },
-                    placeholder: '',
-                    theme: 'snow'  // or 'bubble'
-                  });
-
-                              
-                document.getElementsByClassName('modal')[0].className = 'modal is-active'
+            for (const topic of topic_instances) {
+                document.getElementById(`topicedit${topic.id}`).addEventListener("click", (event) => {
+    
+                    document.getElementsByClassName('modal-card-body')[0].innerHTML = 
+                    `
+                        <label><strong>Title</strong></label><br>
+                        <input type=\"text\" name=\"title\" id=\"newtitle\" value=\"${topic.title}\"></input><br><br>
+                        <div id=\"editor\" style=\"height: 375px\">
+                        </div><br>
+                        <button class=\"button is-primary\" id=\"addpassage\">Add passage</button><br><br>
+                        <div id=\"topicpassages\"></div>
+                        <button class=\"button is-primary\" id=\"submittopic\">Submit topic</button>
+                    `
                 
-                document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
+                    Topic.quill = new Quill('#editor', {
+                        modules: {
+                          toolbar: [
+                            [{ 'font': [] }, { 'size': [] }],
+                            [ 'bold', 'italic', 'underline', 'strike' ],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'script': 'super' }, { 'script': 'sub' }],
+                            [{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block' ],
+                            [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }],
+                            [ 'direction', { 'align': [] }],
+                            [ 'link', 'image', 'video', 'formula' ],
+                            [ 'clean' ]]
+                        },
+                        placeholder: '',
+                        theme: 'snow'  // or 'bubble'
+                      });
+    
+                                  
+                    document.getElementsByClassName('modal')[0].className = 'modal is-active'
                     
-                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
-                    Topic.addTopic()
+                    document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
+                        
+                        document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                        Topic.addTopic()
+                    })
+    
+                    //debugger
+                    
+                    document.querySelector("button.ql-video").addEventListener("click", () => {
+                        //debugger
+                        document.getElementsByClassName('ql-tooltip')[0].style = "top: 30px; left: 0px"
+                    }) 
+                    //debugger
+                    document.getElementsByClassName('ql-editor')[0].innerHTML = topic.content
+                    topic.patchFetchNewTopic()
+    
+                    
                 })
-
-                //debugger
-                document.getElementsByClassName('ql-video')[0].addEventListener("click", () => {
-                    document.getElementsByClassName('ql-tooltip')[0].style = "top: 30px; left: 0px"
-                }) 
-                //debugger
-                document.getElementsByClassName('ql-editor')[0].innerHTML = topic.content
-                topic.patchFetchNewTopic()
-            })
-        }
-
-        
+            }
+    
         
     }
 
@@ -373,28 +358,35 @@ class Topic {
             .then(function(topic_array) {
                 
                 //debugger
-                Topic.updateRenderTopic(topic_array)
+                let updatedTopic = Topic.instances.find(topic => 
+                    topic.id === topic_array['data']['id']
+                )
+                updatedTopic.updateRenderTopic(topic_array)
 
             })
         })
     }
 
-    static updateRenderTopic(topic_array) {
+    updateRenderTopic(topic_array) {
         
-        debugger
+        //debugger
 
         document.getElementsByClassName('modal is-active')[0].className = 'modal'
 
-        this.title = topic_array[i]['attributes']['title']
-        this.content = topic_array[i]['attributes']['content']
-        this.localtime = topic_array[i]['attributes']['localTime']
-        this.passage_ids = topic_array[i]['attributes']['passage_ids']
-        this.comment_ids = topic_array[i]['attributes']['comment_ids']
+
+
+        this.title = topic_array['data']['attributes']['title']
+        this.content = topic_array['data']['attributes']['content']
+        this.localtime = topic_array['data']['attributes']['localTime']
+        this.passage_ids = topic_array['data']['attributes']['passage_ids']
+        this.comment_ids = topic_array['data']['attributes']['comment_ids']
 
         document.getElementById(`topic ${this.id} title`).innerHTML = this.title
-        document.getElementById(`topic ${this.id} localtime`).innerHTML = this.title
+        document.getElementById(`topic ${this.id} localtime`).innerHTML = this.localtime
         document.getElementById(`topiccontent${this.id}`).innerHTML = this.content
 
     }
+
+
 }
 
