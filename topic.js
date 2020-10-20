@@ -301,6 +301,7 @@ class Topic {
                     //debugger
                     document.getElementsByClassName('ql-editor')[0].innerHTML = topic.content
                     Passage.addPassageForm()
+                    Passage.editPassagesForm(topic)
                     topic.patchFetchNewTopic()
     
                     
@@ -350,8 +351,10 @@ class Topic {
                     topic.id === topic_data['data']['id']
                 )
                 updatedTopic.updateRenderTopic(topic_data)
+                
+                
 
-                //Passage.getFetchPassages(updatedTopic)
+                Passage.updatePassages(topic_data['data']['attributes']['passages'], updatedTopic)
                 
                 console.log("updated");
             })

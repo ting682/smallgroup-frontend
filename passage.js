@@ -155,10 +155,53 @@ class Passage {
         return newPassages
     }
 
-    static checkNewPassages(topic) {
+    static updatePassages(passages_array, topic) {
         
-        
+        for (const passage of passages_array) {
+            let passageFind = Passage.instances.find(passage_match => passage_match.id === passage.id)
+
+            passageFind.content = passage.content
+            passageFind.book = passage.book
+            passageFind.chapter = passage.chapter
+            passageFind.verse = passage.verse
 
 
+        }
+
+        if (topic.passages_rendered) {
+            document.getElementsByClassName(`passages ${topic.id}`)[0].innerHTML = ""
+            Passage.renderPassages(topic)
+        }
+
+
+    }
+
+    static editPassagesForm(topic) {
+        let topic_passages = Passage.getExistingPassages(topic)
+
+        document.getElementById('topicpassages').innerHTML += 
+            `<div id=\"existing passages\"></div>`
+
+
+        for (const passage of topic_passages) {
+            document.getElementById('existing passages').innerHTML +=
+
+            `<div id=\"existing passage ${passage.id}\">
+                
+                <label>Existing passage content</label><br>
+                <textarea id=\"existing passage content ${passage.id}\" data-passage-id=\"${passage.id}\" style=\"width: 500px; height: 100px\">${passage.content}</textarea><br>
+                <label>Book:</label><br>
+                <input type=\"text\" id=\"existing passage book ${passage.id}\" data-passage-id=\"${passage.id}\" value=\"${passage.book}\"></input><br>
+                <label>Chapter:</label><br>
+                <input type=\"text\" id=\"existing passage chapter ${passage.id}\" data-passage-id=\"${passage.id}\" value=\"${passage.chapter}\"></input><br>
+                <label>Verse:</label><br>
+                <input type=\"text\" id=\"existing passage verse ${passage.id}\" data-passage-id=\"${passage.id}\" value=\"${passage.verse}\"></input><br><br>
+            </div>
+            `
+        }
+    }
+
+    static getUpdatedPassagesForm(passages_attributes, topic) {
+        
     }
 }
