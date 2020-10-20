@@ -1,5 +1,3 @@
-//const {convertHtmlToDelta} = require('/node_modules/');
-
 class Topic {
     
     constructor(id, title, content, localtime, name, passage_ids, comment_ids) {
@@ -129,8 +127,13 @@ class Topic {
             
             document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
                 
-                document.getElementsByClassName('modal is-active')[0].className = 'modal'
-                Topic.addTopic()
+                if (document.getElementsByClassName('modal is-active')[0] === undefined) {
+
+                } else {
+                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                }
+                
+                //Topic.addTopic()
             })
 
             //debugger
@@ -190,7 +193,7 @@ class Topic {
             
             //debugger
 
-            let newPassagesForTopic = Topic.getNewPassagesForm()
+            let newPassagesForTopic = Passage.getNewPassagesForm()
 
             let configObj = {
                 method: "POST",
@@ -240,29 +243,7 @@ class Topic {
     }
 
 
-    static getNewPassagesForm() {
 
-        let newPassages = []
-        //debugger
-        //let newPassage = []
-        for(let i = 1; i < Topic.newPassageCount + 1; i++) {
-            //let passage_num = String(i - 1)
-            newPassages.push({
-                
-                content: document.getElementById(`new passage content ${i}`).value,
-                book: document.getElementById(`new passage book ${i}`).value,
-                chapter: document.getElementById(`new passage chapter ${i}`).value,
-                verse: document.getElementById(`new passage verse ${i}`).value,
-                user_id: "1"
-            
-        })
-
-            
-            
-        }
-
-        return newPassages
-    }
 
     static addEditListener(topic_instances) {
         
@@ -302,8 +283,13 @@ class Topic {
                     
                     document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
                         
-                        document.getElementsByClassName('modal is-active')[0].className = 'modal'
-                        Topic.addTopic()
+                        if (document.getElementsByClassName('modal is-active')[0] === undefined) {
+
+                        } else {
+                            document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                        }
+                        
+                        //Topic.addTopic()
                     })
     
                     //debugger
@@ -314,6 +300,7 @@ class Topic {
                     }) 
                     //debugger
                     document.getElementsByClassName('ql-editor')[0].innerHTML = topic.content
+                    Passage.addPassageForm()
                     topic.patchFetchNewTopic()
     
                     
@@ -327,12 +314,14 @@ class Topic {
     patchFetchNewTopic() {
         
         document.getElementById('submittopic').addEventListener("click", (event) => {
-            console.log("updated")
+            
             
             
             //debugger
 
-            let newPassagesForTopic = Topic.getNewPassagesForm()
+            let newPassagesForTopic = Passage.getNewPassagesForm()
+
+            debugger
 
             let configObj = {
                 method: "PATCH",
@@ -344,7 +333,6 @@ class Topic {
                     
                     topic: {
                         title: document.getElementById('newtitle').value,
-                        //content: "hello",
                         content: Topic.quill.root.innerHTML,
                         passages_attributes: newPassagesForTopic,
                         user_id: "1"
@@ -357,12 +345,13 @@ class Topic {
             .then(resp => resp.json())
             .then(function(topic_array) {
                 
-                //debugger
+                debugger
                 let updatedTopic = Topic.instances.find(topic => 
                     topic.id === topic_array['data']['id']
                 )
                 updatedTopic.updateRenderTopic(topic_array)
 
+                console.log("updated");
             })
         })
     }
