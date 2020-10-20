@@ -321,7 +321,7 @@ class Topic {
 
             let newPassagesForTopic = Passage.getNewPassagesForm()
 
-            debugger
+            
 
             let configObj = {
                 method: "PATCH",
@@ -343,20 +343,22 @@ class Topic {
 
             fetch(`${baseUrl}/users/1/topics/${this.id}`, configObj)
             .then(resp => resp.json())
-            .then(function(topic_array) {
+            .then(function(topic_data) {
                 
-                debugger
+                
                 let updatedTopic = Topic.instances.find(topic => 
-                    topic.id === topic_array['data']['id']
+                    topic.id === topic_data['data']['id']
                 )
-                updatedTopic.updateRenderTopic(topic_array)
+                updatedTopic.updateRenderTopic(topic_data)
 
+                //Passage.getFetchPassages(updatedTopic)
+                
                 console.log("updated");
             })
         })
     }
 
-    updateRenderTopic(topic_array) {
+    updateRenderTopic(topic_data) {
         
         //debugger
 
@@ -364,11 +366,11 @@ class Topic {
 
 
 
-        this.title = topic_array['data']['attributes']['title']
-        this.content = topic_array['data']['attributes']['content']
-        this.localtime = topic_array['data']['attributes']['localTime']
-        this.passage_ids = topic_array['data']['attributes']['passage_ids']
-        this.comment_ids = topic_array['data']['attributes']['comment_ids']
+        this.title = topic_data['data']['attributes']['title']
+        this.content = topic_data['data']['attributes']['content']
+        this.localtime = topic_data['data']['attributes']['localTime']
+        this.passage_ids = topic_data['data']['attributes']['passage_ids']
+        this.comment_ids = topic_data['data']['attributes']['comment_ids']
 
         document.getElementById(`topic ${this.id} title`).innerHTML = this.title
         document.getElementById(`topic ${this.id} localtime`).innerHTML = this.localtime
@@ -376,6 +378,6 @@ class Topic {
 
     }
 
-
+    
 }
 

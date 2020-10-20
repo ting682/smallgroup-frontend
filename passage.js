@@ -154,4 +154,11 @@ class Passage {
 
         return newPassages
     }
+
+    static checkNewPassages(topic) {
+        
+        
+
+
+    }
 }
