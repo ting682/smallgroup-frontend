@@ -322,7 +322,7 @@ class Topic {
 
             let newPassagesForTopic = Passage.getNewPassagesForm()
 
-            
+            let allPassagesForTopic = Passage.getUpdatedPassagesForm(newPassagesForTopic, this)
 
             let configObj = {
                 method: "PATCH",
@@ -335,7 +335,7 @@ class Topic {
                     topic: {
                         title: document.getElementById('newtitle').value,
                         content: Topic.quill.root.innerHTML,
-                        passages_attributes: newPassagesForTopic,
+                        passages_attributes: allPassagesForTopic,
                         user_id: "1"
                     }   
                     
@@ -346,14 +346,14 @@ class Topic {
             .then(resp => resp.json())
             .then(function(topic_data) {
                 
-                
+                //debugger
                 let updatedTopic = Topic.instances.find(topic => 
                     topic.id === topic_data['data']['id']
                 )
                 updatedTopic.updateRenderTopic(topic_data)
                 
                 
-
+                //debugger
                 Passage.updatePassages(topic_data['data']['attributes']['passages'], updatedTopic)
                 
                 console.log("updated");
@@ -381,6 +381,7 @@ class Topic {
 
     }
 
+    
     
 }
 

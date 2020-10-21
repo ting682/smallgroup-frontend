@@ -6,11 +6,12 @@ class Passage {
         this.chapter = chapter
         this.verse = verse
         this.topic_ids = topic_ids
+        Passage.instances.push(this)
     }
 
     static renderPassages(topic) {
         
-
+        //debugger
         for (const passage of Passage.getExistingPassages(topic)) {
             
             document.getElementsByClassName(`passages ${topic.id}`)[0].innerHTML += 
@@ -30,11 +31,33 @@ class Passage {
     }
 
     static createNewPassages(passage_array) {
+        //debugger
         for (const passage of passage_array) {
-            let new_passage = new Passage (passage['id'], passage['attributes']['content'], passage['attributes']['book'], passage['attributes']['chapter'], passage['attributes']['verse'], passage['attributes']['topic_ids'])
-            
-            Passage.instances.push(new_passage)
+   
+            // try {
+                let new_passage = new Passage (
+                    passage['id'], 
+                    passage['attributes']['content'], 
+                    passage['attributes']['book'], 
+                    passage['attributes']['chapter'], 
+                    passage['attributes']['verse'], 
+                    passage['attributes']['topic_ids'])
+                
+
+
         }
+    }
+
+    static createNewPassage(passage, topic) {
+        let new_passage = new Passage (
+                    passage['id'], 
+                    passage['content'], 
+                    passage['book'], 
+                    passage['chapter'], 
+                    passage['verse'],
+                    [parseInt(topic.id)])
+                
+        //Passage.instances.push(new_passage)
     }
 
     static addShowPassageListener(topic_instances) {
@@ -156,18 +179,24 @@ class Passage {
     }
 
     static updatePassages(passages_array, topic) {
-        
+        //debugger
         for (const passage of passages_array) {
-            let passageFind = Passage.instances.find(passage_match => passage_match.id === passage.id)
+            let passageFind = Passage.instances.find(passage_match => passage_match.id === String(passage.id))
 
-            passageFind.content = passage.content
-            passageFind.book = passage.book
-            passageFind.chapter = passage.chapter
-            passageFind.verse = passage.verse
+            if (passageFind === undefined) {
+                Passage.createNewPassage(passage, topic)
+            } else {
+                passageFind.content = passage.content
+                passageFind.book = passage.book
+                passageFind.chapter = passage.chapter
+                passageFind.verse = passage.verse
+            }
+            
 
 
         }
 
+        //debugger
         if (topic.passages_rendered) {
             document.getElementsByClassName(`passages ${topic.id}`)[0].innerHTML = ""
             Passage.renderPassages(topic)
@@ -202,6 +231,23 @@ class Passage {
     }
 
     static getUpdatedPassagesForm(passages_attributes, topic) {
-        
+        //debugger
+
+        let topic_passages = Passage.getExistingPassages(topic)
+
+        for (const passage of topic_passages) {
+            passages_attributes.push({
+                
+                content: document.getElementById(`existing passage content ${passage.id}`).value,
+                book: document.getElementById(`existing passage book ${passage.id}`).value,
+                chapter: document.getElementById(`existing passage chapter ${passage.id}`).value,
+                verse: document.getElementById(`existing passage verse ${passage.id}`).value,
+                passage_id: passage.id
+            
+            })
+        }
+
+        return passages_attributes
+
     }
 }
