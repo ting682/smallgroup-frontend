@@ -18,12 +18,13 @@ class Topic {
     renderTopic() {
         document.getElementById("feed").innerHTML += 
             `
-                <div class=\"card article\">
+                <div class=\"card article\" id=\"topic ${this.id}\">
                     <div class=\"card-content\">
                         <div class=\"media\">
-                            <div class=\"media-content has-text-left\" id=\"topic ${this.id}\">
+                            <div class=\"media-content has-text-left\" >
                                 <h2 class=\"title\" id=\"topic ${this.id} title\">${this.title}</h2>
                                 <button class=\"button is-primary\" id=\"topicedit${this.id}\">Edit topic</button>
+                                <button class=\"button is-primary\" id=\"topicdelete${this.id}\">Delete topic</button>
                                 <p id=\"topic ${this.id} name\">By: ${this.name}</p>
                                 <p id=\"topic ${this.id} localtime\">Updated: ${this.localtime}</p>
                                 <div class=\"subtitle\" id=\"topiccontent${this.id}\"></div>
@@ -110,6 +111,7 @@ class Topic {
             Topic.addTopic()
 
             Topic.addEditListener(Topic.instances)
+            Topic.deleteFetchTopic()
         })
 
     }
@@ -382,6 +384,25 @@ class Topic {
     }
 
     
-    
+    static deleteFetchTopic() {
+
+        for(const topic of Topic.instances) {
+            //debugger
+            document.getElementById(`topicdelete${topic.id}`).addEventListener("click", () => {
+
+                let configObj = {
+                    method: "DELETE"
+                }
+                fetch(`${baseUrl}/users/1/topics/${topic.id}`, configObj)
+                .then(resp => resp.json())
+                .then(delete_data => {
+                    document.getElementById(`topic ${topic.id}`).remove()
+
+                    //debugger
+                })
+            })
+        }
+        
+    }
 }
 
