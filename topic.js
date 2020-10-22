@@ -16,7 +16,7 @@ class Topic {
     }
 
     renderTopic() {
-        document.getElementById("feed").innerHTML += 
+        document.getElementById("feed").innerHTML = 
             `
                 <div class=\"card article\" id=\"topic ${this.id}\">
                     <div class=\"card-content\">
@@ -46,6 +46,8 @@ class Topic {
                     </div>
                 
                 </div>`
+
+            + document.getElementById("feed").innerHTML
 
         
 
@@ -388,7 +390,7 @@ class Topic {
         this.comment_ids = topic_data['data']['attributes']['comment_ids']
 
         document.getElementById(`topic ${this.id} title`).innerHTML = this.title
-        document.getElementById(`topic ${this.id} localtime`).innerHTML = this.localtime
+        document.getElementById(`topic ${this.id} localtime`).innerHTML = "Updated " + this.localtime
         document.getElementById(`topiccontent${this.id}`).innerHTML = this.content
 
     }
@@ -399,14 +401,19 @@ class Topic {
         for(const topic of Topic.instances) {
             //debugger
             document.getElementById(`topicdelete${topic.id}`).addEventListener("click", () => {
-
+                debugger
                 let configObj = {
                     method: "DELETE",
-                    Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+                    }
                 }
                 fetch(`${baseUrl}/topics/${topic.id}`, configObj)
                 .then(resp => resp.json())
                 .then(delete_data => {
+
+                    //debugger
                     document.getElementById(`topic ${topic.id}`).remove()
 
                     //debugger
