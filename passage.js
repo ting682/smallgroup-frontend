@@ -89,7 +89,15 @@ class Passage {
     }
 
     static getFetchPassages(topic) {
-        fetch(`${baseUrl}/users/1/topics/${topic.id}/passages`)
+
+        let configObj = {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+            }
+        }
+
+        fetch(`${baseUrl}/topics/${topic.id}/passages`, configObj)
         .then(resp => resp.json())
         .then(function (passages) {
             let passage_array = passages['data']

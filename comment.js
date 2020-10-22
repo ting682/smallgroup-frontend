@@ -30,8 +30,14 @@ class Comment {
 
         Comment.renderAddComment(topic)
         
+        let configObj = {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+            }
+        }
 
-        fetch(`${baseUrl}/users/1/topics/${topic.id}/comments`)
+        fetch(`${baseUrl}/topics/${topic.id}/comments`, configObj)
         .then(resp => resp.json())
         .then(function(comments) {
 
@@ -111,7 +117,8 @@ class Comment {
             let configObj = {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
                 },
                 
                 body: JSON.stringify({
@@ -120,13 +127,13 @@ class Comment {
                         topic_id: topic.id,
                         //content: "hello",
                         content: this.getElementsByTagName('textarea')[0].value,
-                        user_id: "1"
+                        user_id: User.currentUser.id
                     }   
                     
                 })
             }
 
-            fetch(`${baseUrl}/users/1/topics/${topic.id}/comments`, configObj)
+            fetch(`${baseUrl}/topics/${topic.id}/comments`, configObj)
             .then(resp => resp.json())
             .then(function(comment_data) {
                 

@@ -1,8 +1,8 @@
 class User {
-    constructor(name, email, passages) {
+    constructor(name, email, id) {
         this.name = name
         this.email = email
-        this.passages = passages
+        this.id = id
     }
 
     static renderSignup() {
@@ -70,6 +70,11 @@ class User {
         .then(resp => resp.json())
         .then(function (user_data) {
             console.log(user_data);
+            User.currentUser = new User(json['user']["data"]["attributes"]["name"], json['user']["data"]["attributes"]["email_address"], json['user']["data"]['id'])
+            localStorage.setItem('jwt_token', json.jwt)
+            localStorage.setItem('user_id', User.currentUser.id)
+            localStorage.setItem('email', User.email)
+            localStorage.setItem('name', User.name)
             document.getElementsByClassName('modal is-active')[0].className = 'modal'
         })
     }
@@ -130,7 +135,7 @@ class User {
     }
 
     static postFetchLogin() {
-
+        //debugger
         let configObj = {
             method: "POST",
             headers: {
@@ -150,10 +155,41 @@ class User {
         
         fetch(`${baseUrl}/login`, configObj)
         .then(resp => resp.json())
-        .then(function (user_data) {
-            console.log(user_data);
+        .then(function (json) {
+            //debugger
+            //console.log(json);
+            //debugger
+            User.currentUser = new User(json['user']["data"]["attributes"]["name"], json['user']["data"]["attributes"]["email_address"], json['user']["data"]['id'])
+            localStorage.setItem('jwt_token', json.jwt)
+            localStorage.setItem('user_id', User.currentUser.id)
+            localStorage.setItem('email', User.currentUser.email)
+            localStorage.setItem('name', User.currentUser.name)
             document.getElementsByClassName('modal is-active')[0].className = 'modal'
+            
         })
+    }
+
+    static loginListener() {
+        //debugger
+        document.getElementById("login").addEventListener("click", () => {
+            console.log("login");
+            User.renderLogin()
+            User.loginFormHandler()
+        })
+    }
+
+    static loginFormHandler() {
+        
+        document.getElementById("loginsubmit").onsubmit = function (event) {
+            //debugger
+            event.preventDefault()
+
+            User.postFetchLogin()
+
+            
+            return false
+        }
+
     }
 
 

@@ -82,13 +82,20 @@ class Topic {
             </div>`
 
             User.signupListener()
+            User.loginListener()
+
     }
 
     static getTopics() {
     
-        
+        let configObj = {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
+            }
+        }
 
-        fetch(`${baseUrl}/users/1/topics`)
+        fetch(`${baseUrl}/topics`, configObj)
         .then(resp => resp.json())
         .then(function(topics) {
             
@@ -105,6 +112,8 @@ class Topic {
                 
             }
             
+            User.currentUser = new User(localStorage['name'], localStorage['email'], localStorage['user_id'])
+
             Comment.addShowCommentListener(Topic.instances)
 
             Passage.addShowPassageListener(Topic.instances)
@@ -210,13 +219,13 @@ class Topic {
                         //content: "hello",
                         content: Topic.quill.root.innerHTML,
                         passages_attributes: newPassagesForTopic,
-                        user_id: "1"
+                        user_id: User.currentUser.id
                     }   
                     
                 })
             }
 
-            fetch(`${baseUrl}/users/1/topics`, configObj)
+            fetch(`${baseUrl}/topics`, configObj)
             .then(resp => resp.json())
             .then(function(topic_data) {
                 
@@ -329,7 +338,8 @@ class Topic {
             let configObj = {
                 method: "PATCH",
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
                 },
                 
                 body: JSON.stringify({
@@ -338,13 +348,13 @@ class Topic {
                         title: document.getElementById('newtitle').value,
                         content: Topic.quill.root.innerHTML,
                         passages_attributes: allPassagesForTopic,
-                        user_id: "1"
+                        user_id: User.currentUser.id
                     }   
                     
                 })
             }
 
-            fetch(`${baseUrl}/users/1/topics/${this.id}`, configObj)
+            fetch(`${baseUrl}/topics/${this.id}`, configObj)
             .then(resp => resp.json())
             .then(function(topic_data) {
                 
@@ -391,9 +401,10 @@ class Topic {
             document.getElementById(`topicdelete${topic.id}`).addEventListener("click", () => {
 
                 let configObj = {
-                    method: "DELETE"
+                    method: "DELETE",
+                    Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
                 }
-                fetch(`${baseUrl}/users/1/topics/${topic.id}`, configObj)
+                fetch(`${baseUrl}/topics/${topic.id}`, configObj)
                 .then(resp => resp.json())
                 .then(delete_data => {
                     document.getElementById(`topic ${topic.id}`).remove()
