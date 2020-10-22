@@ -34,7 +34,10 @@ class Passage {
         //debugger
         for (const passage of passage_array) {
    
-            // try {
+            let passageFind = Passage.instances.find(function (passage_match) {
+                return passage_match.id === passage['id']
+            })
+            if (passageFind === undefined) {
                 let new_passage = new Passage (
                     passage['id'], 
                     passage['attributes']['content'], 
@@ -42,7 +45,7 @@ class Passage {
                     passage['attributes']['chapter'], 
                     passage['attributes']['verse'], 
                     passage['attributes']['topic_ids'])
-                
+            }
 
 
         }

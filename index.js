@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Topic.getTopics()
     
-
+    
 
 })
 

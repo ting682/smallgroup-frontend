@@ -55,7 +55,7 @@ class Topic {
 
 
     static renderTopicPage() {
-        document.body.innerHTML = 
+        document.getElementById("all topics").innerHTML = 
             `
             <section class=\"articles\">
                 <div class=\"column is-8 is-offset-2\" id=\"feed\">
@@ -81,7 +81,7 @@ class Topic {
                 </div>
             </div>`
 
-
+            User.signupListener()
     }
 
     static getTopics() {
