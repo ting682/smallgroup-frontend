@@ -96,4 +96,65 @@ class User {
         }
 
     }
+
+    static renderLogin(){
+        document.getElementsByClassName('modal')[0].className = 'modal is-active'
+
+        document.getElementsByClassName('modal-card-body')[0].innerHTML = ""
+
+        document.getElementsByClassName('modal-card-body')[0].innerHTML = 
+            `<div class=\"login form\">
+                <form id=\"loginsubmit\">
+
+                    <label>Email</label><br>
+                    <input type=\"text\" id=\"login email\"></input><br><br>
+
+                    <label>Password</label><br>
+                    <input type=\"password\" id=\"login password\"></input><br><br>
+
+
+                    <input class=\"button is-primary\" type=\"submit\" value=\"Login\" ></input>
+                </form>
+            </div>`
+
+            document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
+                
+                if (document.getElementsByClassName('modal is-active')[0] === undefined) {
+
+                } else {
+                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                }
+                
+                //Topic.addTopic()
+            })
+    }
+
+    static postFetchLogin() {
+
+        let configObj = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            
+            body: JSON.stringify({
+                
+                user: {
+                    email_address: document.getElementById('login email').value,
+                    //content: "hello",
+                    password: document.getElementById('login password').value
+                }   
+                
+            })
+        }
+        
+        fetch(`${baseUrl}/login`, configObj)
+        .then(resp => resp.json())
+        .then(function (user_data) {
+            console.log(user_data);
+            document.getElementsByClassName('modal is-active')[0].className = 'modal'
+        })
+    }
+
+
 }
