@@ -76,6 +76,7 @@ class User {
             localStorage.setItem('email', User.email)
             localStorage.setItem('name', User.name)
             document.getElementsByClassName('modal is-active')[0].className = 'modal'
+            Topic.getTopics()
         })
     }
 
@@ -165,6 +166,7 @@ class User {
             localStorage.setItem('email', User.currentUser.email)
             localStorage.setItem('name', User.currentUser.name)
             document.getElementsByClassName('modal is-active')[0].className = 'modal'
+            Topic.getTopics()
             
         })
     }
@@ -192,5 +194,34 @@ class User {
 
     }
 
+    static displayNotification(data) {
+        
+        const scrollToTop = () => {
+            const c = document.documentElement.scrollTop || document.body.scrollTop;
+            if (c > 0) {
+              window.requestAnimationFrame(scrollToTop);
+              window.scrollTo(0, c - c / 8);
+            }
+          };
+          scrollToTop();
+        document.getElementsByClassName('notification')[0].style = "display: block"
+        document.getElementsByClassName('notification')[0].innerHTML =  `<button class=\"delete\"></button>` + data 
+        document.getElementsByClassName('delete')[0].addEventListener("click", () => {
+            document.getElementsByClassName('notification')[0].innerHTML = ""
+            document.getElementsByClassName('notification')[0].style = "display: none"
+        })
+    }
+
+    static logoutUser() {
+
+        document.getElementById("logout").addEventListener("click", () => {
+            localStorage.setItem('jwt_token', "")
+            User.displayNotification("Logged out successfully")
+            document.getElementById('feed').innerHTML = ""
+            document.getElementById('addtopic').style = "display: none"
+        })
+        
+
+    }
 
 }

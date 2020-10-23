@@ -60,12 +60,16 @@ class Topic {
         document.getElementById("all topics").innerHTML = 
             `
             <section class=\"articles\">
+                <div class=\"notification is-warning\" style=\"display: none\">
+                    
+                </div>
+                <button class=\"button is-primary\" id=\"addtopic\" style=\"display: none\">Add topic</button>
                 <div class=\"column is-8 is-offset-2\" id=\"feed\">
-                    <div class=\"card article\">
+                    <div class=\"card article\" >
                         <div class=\"card-content\">
                             
                             
-                            <button class=\"button is-primary\" id=\"addtopic\">Add topic</button>
+                            
                         </div>
                     </div>
                 </div>
@@ -85,6 +89,7 @@ class Topic {
 
             User.signupListener()
             User.loginListener()
+            User.logoutUser()
 
     }
 
@@ -122,14 +127,14 @@ class Topic {
             Topic.addTopic()
 
             Topic.addEditListener(Topic.instances)
-            Topic.deleteFetchTopic()
+            Topic.deleteFetchTopic(Topic.instances)
         })
 
     }
 
     static addTopic(){
         
-
+        document.getElementById('addtopic').style = "display: block"
 
         document.getElementById('addtopic').addEventListener("click", () => {
             //debugger
@@ -211,7 +216,8 @@ class Topic {
             let configObj = {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
                 },
                 
                 body: JSON.stringify({
@@ -245,12 +251,15 @@ class Topic {
                 
                 Topic.instances.push(new_topic)
                 new_topic.renderTopic()
-                Comment.addShowCommentListener([new_topic])
+                Topic.refreshListeners()
+                // Comment.addShowCommentListener([new_topic])
 
-                Passage.addShowPassageListener([new_topic])
+                // Passage.addShowPassageListener([new_topic])
                 
 
-                Topic.addEditListener([new_topic])
+                // Topic.addEditListener([new_topic])
+                // Topic.deleteFetchTopic([new_topic])
+                
             })
         })
     }
@@ -359,18 +368,27 @@ class Topic {
             fetch(`${baseUrl}/topics/${this.id}`, configObj)
             .then(resp => resp.json())
             .then(function(topic_data) {
-                
                 //debugger
-                let updatedTopic = Topic.instances.find(topic => 
-                    topic.id === topic_data['data']['id']
-                )
-                updatedTopic.updateRenderTopic(topic_data)
+                if (topic_data.errors) {
+                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                    User.displayNotification(topic_data.errors)
+
+                } else {
+                    let updatedTopic = Topic.instances.find(topic => 
+                        topic.id === topic_data['data']['id']
+                    )
+                    updatedTopic.updateRenderTopic(topic_data)
+                    
+                    
+                    //debugger
+                    Passage.updatePassages(topic_data['data']['attributes']['passages'], updatedTopic)
+                    
+                    console.log("updated");
+                }
                 
+            }).catch(data => {
+                console.log(data);
                 
-                //debugger
-                Passage.updatePassages(topic_data['data']['attributes']['passages'], updatedTopic)
-                
-                console.log("updated");
             })
         })
     }
@@ -396,12 +414,12 @@ class Topic {
     }
 
     
-    static deleteFetchTopic() {
+    static deleteFetchTopic(topic_instances) {
 
-        for(const topic of Topic.instances) {
+        for(const topic of topic_instances) {
             //debugger
             document.getElementById(`topicdelete${topic.id}`).addEventListener("click", () => {
-                debugger
+                //debugger
                 let configObj = {
                     method: "DELETE",
                     headers: {
@@ -414,7 +432,12 @@ class Topic {
                 .then(delete_data => {
 
                     //debugger
-                    document.getElementById(`topic ${topic.id}`).remove()
+                    if (delete_data.errors) {
+                        User.displayNotification(delete_data.errors)
+                    } else {
+                        document.getElementById(`topic ${topic.id}`).remove()
+                    }
+                    
 
                     //debugger
                 })
@@ -422,5 +445,18 @@ class Topic {
         }
         
     }
+
+    static refreshListeners() {
+
+        Comment.addShowCommentListener(Topic.instances)
+
+        Passage.addShowPassageListener(Topic.instances)
+                
+
+        Topic.addEditListener(Topic.instances)
+        Topic.deleteFetchTopic(Topic.instances)
+    }
+
+
 }
 
