@@ -45,7 +45,7 @@ class User {
     }
 
 
-    static postFetchSignup() {
+    static postFetchSignup(email_address, password, password_confirmation, name) {
 
         let configObj = {
             method: "POST",
@@ -56,27 +56,33 @@ class User {
             body: JSON.stringify({
                 
                 user: {
-                    email_address: document.getElementById('signup email').value,
-                    //content: "hello",
-                    password: document.getElementById('signup password').value,
-                    password_confirmation: document.getElementById('signup password confirmation').value,
-                    name: document.getElementById('signup name').value
+                    email_address,
+                    password,
+                    password_confirmation,
+                    name
                 }   
                 
             })
         }
-        
+        //debugger
         fetch(`${baseUrl}/signup`, configObj)
         .then(resp => resp.json())
         .then(function (user_data) {
-            console.log(user_data);
-            User.currentUser = new User(json['user']["data"]["attributes"]["name"], json['user']["data"]["attributes"]["email_address"], json['user']["data"]['id'])
-            localStorage.setItem('jwt_token', json.jwt)
-            localStorage.setItem('user_id', User.currentUser.id)
-            localStorage.setItem('email', User.email)
-            localStorage.setItem('name', User.name)
-            document.getElementsByClassName('modal is-active')[0].className = 'modal'
-            Topic.getTopics()
+            if (user_data.error) {
+                User.displayNotification(user_data.error)
+                document.getElementsByClassName('modal is-active')[0].className = 'modal'
+            } else {
+                console.log(user_data);
+                User.currentUser = new User(user_data['user']["data"]["attributes"]["name"], user_data['user']["data"]["attributes"]["email_address"], user_data['user']["data"]['id'])
+                localStorage.setItem('jwt_token', user_data.jwt)
+                localStorage.setItem('user_id', User.currentUser.id)
+                localStorage.setItem('email', User.email)
+                localStorage.setItem('name', User.name)
+                
+                document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                Topic.getTopics()
+            }
+            
         })
     }
 
@@ -95,7 +101,7 @@ class User {
             //debugger
             event.preventDefault()
 
-            User.postFetchSignup()
+            User.postFetchSignup(event.target['signup email'].value, event.target['signup password'].value, event.target['signup password confirmation'].value, event.target['signup name'].value)
 
             
             return false
@@ -135,7 +141,7 @@ class User {
             })
     }
 
-    static postFetchLogin() {
+    static postFetchLogin(email_address, password) {
         //debugger
         let configObj = {
             method: "POST",
@@ -146,9 +152,9 @@ class User {
             body: JSON.stringify({
                 
                 user: {
-                    email_address: document.getElementById('login email').value,
-                    //content: "hello",
-                    password: document.getElementById('login password').value
+                    email_address,
+                    
+                    password
                 }   
                 
             })
@@ -160,13 +166,19 @@ class User {
             //debugger
             //console.log(json);
             //debugger
-            User.currentUser = new User(json['user']["data"]["attributes"]["name"], json['user']["data"]["attributes"]["email_address"], json['user']["data"]['id'])
-            localStorage.setItem('jwt_token', json.jwt)
-            localStorage.setItem('user_id', User.currentUser.id)
-            localStorage.setItem('email', User.currentUser.email)
-            localStorage.setItem('name', User.currentUser.name)
-            document.getElementsByClassName('modal is-active')[0].className = 'modal'
-            Topic.getTopics()
+            if (json.error) {
+                User.displayNotification(json.error)
+                document.getElementsByClassName('modal is-active')[0].className = 'modal'
+            } else {
+                User.currentUser = new User(json['user']["data"]["attributes"]["name"], json['user']["data"]["attributes"]["email_address"], json['user']["data"]['id'])
+                localStorage.setItem('jwt_token', json.jwt)
+                localStorage.setItem('user_id', User.currentUser.id)
+                localStorage.setItem('email', User.currentUser.email)
+                localStorage.setItem('name', User.currentUser.name)
+                document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                Topic.getTopics()
+            }
+            
             
         })
     }
@@ -184,9 +196,11 @@ class User {
         
         document.getElementById("loginsubmit").onsubmit = function (event) {
             //debugger
+            
             event.preventDefault()
 
-            User.postFetchLogin()
+            //debugger
+            User.postFetchLogin(event.target['login email'].value, event.target['login password'].value)
 
             
             return false
@@ -215,13 +229,38 @@ class User {
     static logoutUser() {
 
         document.getElementById("logout").addEventListener("click", () => {
-            localStorage.setItem('jwt_token', "")
+            localStorage.removeItem('jwt_token')
+            localStorage.removeItem('user_id')
+            localStorage.removeItem('email')
+            localStorage.removeItem('name')
+            User.currentUser = undefined
             User.displayNotification("Logged out successfully")
             document.getElementById('feed').innerHTML = ""
             document.getElementById('addtopic').style = "display: none"
         })
         
 
+    }
+
+    static checkLoggedIn() {
+        //debugger
+        if (User.currentUser.id !== undefined) {
+            for (const topic of Topic.instances) {
+                document.getElementById(`topicedit${topic.id}`).style = "display: block"
+                document.getElementById(`topicdelete${topic.id}`).style = "display: block"
+                document.getElementById('addtopic').style = "display: block"
+            }
+            
+            return true
+        } else {
+            for (const topic of Topic.instances) {
+                document.getElementById(`topicedit${topic.id}`).style = "display: none"
+                document.getElementById(`topicdelete${topic.id}`).style = "display: none"
+                document.getElementById('addtopic').style = "display: none"
+            }
+
+            return false
+        }
     }
 
 }

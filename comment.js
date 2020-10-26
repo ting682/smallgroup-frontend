@@ -65,15 +65,17 @@ class Comment {
     }
 
     static renderAddComment(topic) {
-        
-        document.getElementsByClassName(`comments ${topic.id}`)[0].innerHTML = 
+        //debugger
+        if (User.checkLoggedIn()) {
+
+            document.getElementsByClassName(`comments ${topic.id}`)[0].innerHTML = 
 
             `<br><form class=\"new comment${topic.id}\">
                 <textarea class=\"textarea\"></textarea>
                 <br><input type=\"submit\" class=\"button is-secondary\" id=\"add comments ${topic.id}" data-topic-id=\"${topic.id}\" value=\"Add comment\"></input>
                 
             </form><br>`
-
+        }
         
     }
 

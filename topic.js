@@ -23,8 +23,8 @@ class Topic {
                         <div class=\"media\">
                             <div class=\"media-content has-text-left\" >
                                 <h2 class=\"title\" id=\"topic ${this.id} title\">${this.title}</h2>
-                                <button class=\"button is-primary\" id=\"topicedit${this.id}\">Edit topic</button>
-                                <button class=\"button is-primary\" id=\"topicdelete${this.id}\">Delete topic</button>
+                                <button class=\"button is-primary\" id=\"topicedit${this.id}\">Edit topic</button><br>
+                                <button class=\"button is-primary\" id=\"topicdelete${this.id}\" >Delete topic</button><br>
                                 <p id=\"topic ${this.id} name\">By: ${this.name}</p>
                                 <p id=\"topic ${this.id} localtime\">Updated: ${this.localtime}</p>
                                 <div class=\"subtitle\" id=\"topiccontent${this.id}\"></div>
@@ -90,7 +90,7 @@ class Topic {
             User.signupListener()
             User.loginListener()
             User.logoutUser()
-
+            
     }
 
     static getTopics() {
@@ -128,13 +128,14 @@ class Topic {
 
             Topic.addEditListener(Topic.instances)
             Topic.deleteFetchTopic(Topic.instances)
+            User.checkLoggedIn()
         })
 
     }
 
     static addTopic(){
         
-        document.getElementById('addtopic').style = "display: block"
+        //document.getElementById('addtopic').style = "display: block"
 
         document.getElementById('addtopic').addEventListener("click", () => {
             //debugger
@@ -168,13 +169,15 @@ class Topic {
     static renderNewTopicForm() {
         document.getElementsByClassName('modal-card-body')[0].innerHTML = 
             `
+            <form id=\"submittopic\">
                 <label><strong>Title</strong></label><br>
                 <input type=\"text\" name=\"title\" id=\"newtitle\"></input><br><br>
                 <div id=\"editor\" style=\"height: 375px\">
                 </div><br>
                 <button class=\"button is-primary\" id=\"addpassage\">Add passage</button><br><br>
                 <div id=\"topicpassages\"></div>
-                <button class=\"button is-primary\" id=\"submittopic\">Submit topic</button>
+                <input class=\"button is-primary\" type=\"submit\" value=\"Submit topic\" id=\"submittopic\"></input>
+            </form>
             `
         
             Topic.quill = new Quill('#editor', {
@@ -205,10 +208,10 @@ class Topic {
 
     static postFetchNewTopic() {
         
-        document.getElementById('submittopic').addEventListener("click", (event) => {
+        document.getElementById('submittopic').onsubmit = function (event) {
             console.log("submitted")
             
-            
+            event.preventDefault()
             //debugger
 
             let newPassagesForTopic = Passage.getNewPassagesForm()
@@ -223,7 +226,7 @@ class Topic {
                 body: JSON.stringify({
                     
                     topic: {
-                        title: document.getElementById('newtitle').value,
+                        title: event.target['newtitle'].value,
                         //content: "hello",
                         content: Topic.quill.root.innerHTML,
                         passages_attributes: newPassagesForTopic,
@@ -237,31 +240,29 @@ class Topic {
             .then(resp => resp.json())
             .then(function(topic_data) {
                 
-
-                document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                if (topic_data.message) {
+                    User.displayNotification(topic_data.message)
+                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                } else {
+                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
                 //debugger
-                let new_topic = new Topic (
-                    topic_data['data']['id'], 
-                    topic_data['data']['attributes']['title'], 
-                    topic_data['data']['attributes']['content'], 
-                    topic_data['data']['attributes']['localTime'], 
-                    topic_data['data']['attributes']['name'], 
-                    topic_data['data']['attributes']['passage_ids'], 
-                    topic_data['data']['attributes']['comment_ids'])
+                    let new_topic = new Topic (
+                        topic_data['data']['id'], 
+                        topic_data['data']['attributes']['title'], 
+                        topic_data['data']['attributes']['content'], 
+                        topic_data['data']['attributes']['localTime'], 
+                        topic_data['data']['attributes']['name'], 
+                        topic_data['data']['attributes']['passage_ids'], 
+                        topic_data['data']['attributes']['comment_ids'])
+                    
+                    Topic.instances.push(new_topic)
+                    new_topic.renderTopic()
+                    Topic.refreshListeners()
+                }
                 
-                Topic.instances.push(new_topic)
-                new_topic.renderTopic()
-                Topic.refreshListeners()
-                // Comment.addShowCommentListener([new_topic])
-
-                // Passage.addShowPassageListener([new_topic])
-                
-
-                // Topic.addEditListener([new_topic])
-                // Topic.deleteFetchTopic([new_topic])
                 
             })
-        })
+        }
     }
 
 
@@ -274,13 +275,16 @@ class Topic {
     
                     document.getElementsByClassName('modal-card-body')[0].innerHTML = 
                     `
+                    <form id=\"submittopic\">
                         <label><strong>Title</strong></label><br>
                         <input type=\"text\" name=\"title\" id=\"newtitle\" value=\"${topic.title}\"></input><br><br>
                         <div id=\"editor\" style=\"height: 375px\">
                         </div><br>
+                        <input type=\"hidden\" id=\"topic_id"\ value=\"${topic.id}\"></input>
                         <button class=\"button is-primary\" id=\"addpassage\">Add passage</button><br><br>
                         <div id=\"topicpassages\"></div>
-                        <button class=\"button is-primary\" id=\"submittopic\">Submit topic</button>
+                        <input class=\"button is-primary\" type=\"submit\" value=\"Submit topic\" id=\"submittopic\"></input>
+                    </form>
                     `
                 
                     Topic.quill = new Quill('#editor', {
@@ -336,16 +340,16 @@ class Topic {
 
     patchFetchNewTopic() {
         
-        document.getElementById('submittopic').addEventListener("click", (event) => {
+        document.getElementById('submittopic').onsubmit = function (event) {
             
             
-            
+            event.preventDefault()
             //debugger
 
             let newPassagesForTopic = Passage.getNewPassagesForm()
 
             let allPassagesForTopic = Passage.getUpdatedPassagesForm(newPassagesForTopic, this)
-
+            debugger
             let configObj = {
                 method: "PATCH",
                 headers: {
@@ -356,19 +360,19 @@ class Topic {
                 body: JSON.stringify({
                     
                     topic: {
-                        title: document.getElementById('newtitle').value,
+                        title: event.target['newtitle'].value,
                         content: Topic.quill.root.innerHTML,
                         passages_attributes: allPassagesForTopic,
-                        user_id: User.currentUser.id
+                        user_id: User.currentUser.id,
                     }   
                     
                 })
             }
 
-            fetch(`${baseUrl}/topics/${this.id}`, configObj)
+            fetch(`${baseUrl}/topics/${event.target['topic_id'].value}`, configObj)
             .then(resp => resp.json())
             .then(function(topic_data) {
-                //debugger
+                debugger
                 if (topic_data.errors) {
                     document.getElementsByClassName('modal is-active')[0].className = 'modal'
                     User.displayNotification(topic_data.errors)
@@ -390,7 +394,7 @@ class Topic {
                 console.log(data);
                 
             })
-        })
+        }
     }
 
     updateRenderTopic(topic_data) {
