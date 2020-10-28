@@ -90,6 +90,7 @@ class Topic {
             User.signupListener()
             User.loginListener()
             User.logoutUser()
+            Topic.addTopic()
             
     }
 
@@ -124,7 +125,7 @@ class Topic {
             Comment.addShowCommentListener(Topic.instances)
 
             Passage.addShowPassageListener(Topic.instances)
-            Topic.addTopic()
+            
 
             Topic.addEditListener(Topic.instances)
             Topic.deleteFetchTopic(Topic.instances)
@@ -136,30 +137,32 @@ class Topic {
     static addTopic(){
         
         //document.getElementById('addtopic').style = "display: block"
-
-        document.getElementById('addtopic').addEventListener("click", () => {
-            //debugger
-            Topic.renderNewTopicForm()
-            
-            
-            document.getElementsByClassName('modal')[0].className = 'modal is-active'
-            
-            document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
+        
+            document.getElementById('addtopic').addEventListener("click", () => {
+                //debugger
+                Topic.renderNewTopicForm()
                 
-                if (document.getElementsByClassName('modal is-active')[0] === undefined) {
-
-                } else {
-                    document.getElementsByClassName('modal is-active')[0].className = 'modal'
-                }
                 
-                //Topic.addTopic()
+                document.getElementsByClassName('modal')[0].className = 'modal is-active'
+                
+                document.getElementsByClassName('modal-background')[0].addEventListener("click", () => {
+                    
+                    if (document.getElementsByClassName('modal is-active')[0] === undefined) {
+    
+                    } else {
+                        document.getElementsByClassName('modal is-active')[0].className = 'modal'
+                    }
+                    
+                    //Topic.addTopic()
+                })
+    
+                //debugger
+                document.getElementsByClassName('ql-video')[0].addEventListener("click", () => {
+                    document.getElementsByClassName('ql-tooltip')[0].style = "top: 30px; left: 0px"
+                }) 
             })
-
-            //debugger
-            document.getElementsByClassName('ql-video')[0].addEventListener("click", () => {
-                document.getElementsByClassName('ql-tooltip')[0].style = "top: 30px; left: 0px"
-            }) 
-        })
+        
+        
 
         //debugger
         
@@ -239,7 +242,7 @@ class Topic {
             fetch(`${baseUrl}/topics`, configObj)
             .then(resp => resp.json())
             .then(function(topic_data) {
-                
+                //debugger
                 if (topic_data.message) {
                     User.displayNotification(topic_data.message)
                     document.getElementsByClassName('modal is-active')[0].className = 'modal'
@@ -349,7 +352,7 @@ class Topic {
             let newPassagesForTopic = Passage.getNewPassagesForm()
 
             let allPassagesForTopic = Passage.getUpdatedPassagesForm(newPassagesForTopic, this)
-            debugger
+            //debugger
             let configObj = {
                 method: "PATCH",
                 headers: {
@@ -440,6 +443,9 @@ class Topic {
                         User.displayNotification(delete_data.errors)
                     } else {
                         document.getElementById(`topic ${topic.id}`).remove()
+                        Topic.instances = Topic.instances.filter(function (topic_instance) {
+                            return topic_instance.id !== topic.id
+                        })
                     }
                     
 

@@ -1,0 +1,32 @@
+{
+  "name": "smallgroup-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "http-server": "^0.12.3",
+    "live-server": "^1.2.1",
+    "node-quill-converter": "^0.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "started",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ting682/smallgroup-frontend.git"
+  },
+  "keywords": [
+    "small",
+    "group",
+    "bible",
+    "study"
+  ],
+  "author": "Ting Chung",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ting682/smallgroup-frontend/issues"
+  },
+  "homepage": "https://github.com/ting682/smallgroup-frontend#readme"
+}
