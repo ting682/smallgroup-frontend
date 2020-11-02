@@ -89,7 +89,8 @@ class Passage {
     }
 
     static getFetchPassages(topic) {
-
+           //debugger
+           
         let configObj = {
             method: 'GET',
             headers: {
@@ -101,16 +102,18 @@ class Passage {
         .then(resp => resp.json())
         .then(function (passages) {
             let passage_array = passages['data']
-            
+            //debugger
             if (passage_array.length === 0) {
                 topic.passages_rendered = true
                 topic.passages_show = true
                 document.getElementById(`passages ${topic.id}`).innerHTML = "Hide passages"
             } else {
-
+                //debugger
                 Passage.createNewPassages(passage_array)
                 Passage.renderPassages(topic)
-
+                if (topic.existing_passages_form_render) {
+                    Passage.editPassagesForm(topic)
+                }
             }
 
         })
@@ -118,6 +121,7 @@ class Passage {
 
     static getExistingPassages(topic) {
         
+        //debugger
         let passagesFiltered = Passage.instances.filter(function(passage) { 
             return passage.topic_ids.find(topic_id => topic_id === parseInt(topic.id) )})
 
@@ -217,8 +221,17 @@ class Passage {
     }
 
     static editPassagesForm(topic) {
-        let topic_passages = Passage.getExistingPassages(topic)
+        
+        if (topic.passages_rendered) {
 
+        } else {
+            
+            Passage.getFetchPassages(topic)
+        }
+        
+        
+        let topic_passages = Passage.getExistingPassages(topic)
+        
         document.getElementById('topicpassages').innerHTML += 
             `<div id=\"existing passages\"></div>`
 
@@ -242,7 +255,7 @@ class Passage {
     }
 
     static getUpdatedPassagesForm(passages_attributes, topic) {
-        //debugger
+        
 
         let topic_passages = Passage.getExistingPassages(topic)
 

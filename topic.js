@@ -12,6 +12,7 @@ class Topic {
         this.comments_show = false
         this.passages_rendered = false
         this.passages_show = false
+        this.existing_passages_form_render = false
 
     }
 
@@ -330,6 +331,10 @@ class Topic {
                     //debugger
                     document.getElementsByClassName('ql-editor')[0].innerHTML = topic.content
                     Passage.addPassageForm()
+                    
+                    //debugger
+                    topic.existing_passages_form_render = true
+                    //Passage.getFetchPassages(topic)
                     Passage.editPassagesForm(topic)
                     topic.patchFetchNewTopic()
     
@@ -343,6 +348,7 @@ class Topic {
 
     patchFetchNewTopic() {
         
+        let topic = this
         document.getElementById('submittopic').onsubmit = function (event) {
             
             
@@ -351,8 +357,8 @@ class Topic {
 
             let newPassagesForTopic = Passage.getNewPassagesForm()
 
-            let allPassagesForTopic = Passage.getUpdatedPassagesForm(newPassagesForTopic, this)
-            //debugger
+            let allPassagesForTopic = Passage.getUpdatedPassagesForm(newPassagesForTopic, topic)
+            
             let configObj = {
                 method: "PATCH",
                 headers: {
@@ -375,7 +381,7 @@ class Topic {
             fetch(`${baseUrl}/topics/${event.target['topic_id'].value}`, configObj)
             .then(resp => resp.json())
             .then(function(topic_data) {
-                debugger
+                
                 if (topic_data.errors) {
                     document.getElementsByClassName('modal is-active')[0].className = 'modal'
                     User.displayNotification(topic_data.errors)
