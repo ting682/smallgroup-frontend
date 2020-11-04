@@ -160,14 +160,14 @@ class Passage {
         
     }
 
-    static renderExistingPassagesForm() {
+    // static renderExistingPassagesForm() {
 
 
 
-        document.getElementById('addpassage').addEventListener("click", (event) => {
+    //     document.getElementById('addpassage').addEventListener("click", (event) => {
 
-        })
-    }
+    //     })
+    // }
 
     static getNewPassagesForm() {
 

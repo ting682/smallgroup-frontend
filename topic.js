@@ -110,17 +110,19 @@ class Topic {
             
             let topic_array = topics['data']
             Topic.renderTopicPage()
-            
-            for (let i = 0; i < topic_array.length; i++) {
+            const topicArrayLength = topic_array.length
+            for (let i = 0; i < topicArrayLength; i++) {
                 let new_topic = new Topic (topic_array[i]['id'], topic_array[i]['attributes']['title'], topic_array[i]['attributes']['content'], topic_array[i]['attributes']['localTime'], topic_array[i]['attributes']['name'], topic_array[i]['attributes']['passage_ids'], topic_array[i]['attributes']['comment_ids'])
                 
-                new_topic.renderTopic()
+                
                 
                 Topic.instances.push(new_topic)
                 
                 
             }
             
+            Topic.renderAlphabetically()
+
             User.currentUser = new User(localStorage['name'], localStorage['email'], localStorage['user_id'])
 
             Comment.addShowCommentListener(Topic.instances)
@@ -133,6 +135,20 @@ class Topic {
             User.checkLoggedIn()
         })
 
+    }
+
+    static renderAlphabetically() {
+        let sortedTopics = Topic.instances.sort(function(a, b) {
+            if (a.title < b.title) {
+                return 1
+            } else {
+                return -1
+            }
+        })
+        //debugger
+        for (const topic of sortedTopics) {
+            topic.renderTopic()
+        }
     }
 
     static addTopic(){
