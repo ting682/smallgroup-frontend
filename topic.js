@@ -117,11 +117,11 @@ class Topic {
                 
                 
                 Topic.instances.push(new_topic)
-                
+                new_topic.renderTopic()
                 
             }
             
-            Topic.renderAlphabetically()
+            //Topic.renderAlphabetically()
 
             User.currentUser = new User(localStorage['name'], localStorage['email'], localStorage['user_id'])
 
