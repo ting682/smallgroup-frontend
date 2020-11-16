@@ -40,7 +40,7 @@ class Topic {
                                 </div>
                                 <br>
                                 
-                                <span class=\"icon is-small\"><i class=\"far fa-heart\" id=\"heart ${this.id}\" style=\"color: red\"></i></span>
+                                
                             
                             </div>
                         </div>
