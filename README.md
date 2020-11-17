@@ -1,1 +1,3 @@
-# smallgroup-frontend
+# Small group frontend
+
+This is a the frontend portion of code for my smallgroup app. This frontend app is built using Javascript. This app is made for a user to submit bible study topics. The bible study topics can be revised via rich text format via (Quill editor)[https://quilljs.com/]. A user can post the bible topic, add bible passages, and add comments to bible topics. For the frontend, this contains the classes that mirror the models for the backend for the user, topics, comments, and passages. This app uses CORS to communicate to the front end. Also, the authenticity of the posts are verified with JSON web tokens. The output of the JSON uses JSON fast API to serialize the data that is fetched. For a demo of this app, [go here](https://jolly-khorana-0814fc.netlify.app). The code for the backend of this app can be found at [my github link](https://github.com/ting682/smallgroup-backend)
