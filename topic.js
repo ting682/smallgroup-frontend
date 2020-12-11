@@ -103,7 +103,7 @@ class Topic {
                 Authorization: `Bearer ${localStorage.getItem('jwt_token')}`
             }
         }
-
+        Topic.renderTopicPage()
         fetch(`${baseUrl}/topics`, configObj)
         .then(resp => resp.json())
         .then(function(topics) {
