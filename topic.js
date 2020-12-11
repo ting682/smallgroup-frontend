@@ -68,7 +68,7 @@ class Topic {
                 <div class=\"column is-8 is-offset-2\" id=\"feed\">
                     <div class=\"card article\" >
                         <div class=\"card-content\">
-                            
+                            <h1>Loading</h1>
                             
                             
                         </div>
