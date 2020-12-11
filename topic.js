@@ -68,7 +68,7 @@ class Topic {
                 <div class=\"column is-8 is-offset-2\" id=\"feed\">
                     <div class=\"card article\" >
                         <div class=\"card-content\">
-                            <h1>Loading</h1>
+                            <h1 id=\"loading\">Loading</h1>
                             
                             
                         </div>
@@ -122,7 +122,7 @@ class Topic {
             }
             
             //Topic.renderAlphabetically()
-
+            document.getElementById('loading').style = "display: none"
             User.currentUser = new User(localStorage['name'], localStorage['email'], localStorage['user_id'])
 
             Comment.addShowCommentListener(Topic.instances)
