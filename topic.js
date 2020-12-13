@@ -108,7 +108,7 @@ class Topic {
         .then(resp => resp.json())
         .then(function(topics) {
             
-            debugger
+            // debugger
             let topic_array = topics['data']
             Topic.renderTopicPage()
             const topicArrayLength = topic_array.length
