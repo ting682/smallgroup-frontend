@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     Topic.instances = []
     Passage.instances = []
-    let newArray = []
+    // let newArray = []
 
     Topic.getTopics()
     
